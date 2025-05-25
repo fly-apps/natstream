@@ -134,7 +134,7 @@ export default function Home() {
             </span>
           </div>
           {isConnected && (
-            <Badge variant="outline" className="text-xs">
+            <Badge variant="secondary" className="text-xs font-mono bg-gray-200 dark:bg-neutral-900 text-gray-600 dark:text-gray-400 border-0 px-3 py-1">
               [fdaa::3]:4223
             </Badge>
           )}
