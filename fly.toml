@@ -8,6 +8,9 @@ primary_region = 'iad'
 
 [build]
 
+[env]
+  NEXT_TELEMETRY_DISABLED = "1"
+
 [http_service]
   internal_port = 3000
   force_https = true
