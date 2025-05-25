@@ -29,7 +29,7 @@ export async function getNatsConnection(): Promise<NatsConnection> {
         reconnect: true,
         maxReconnectAttempts: 5,
         reconnectTimeWait: 2000, // 2 seconds between reconnect attempts
-        debug: true, // Enable debug logging
+        debug: false,
       });
       
       console.log("NATS connection established successfully");
