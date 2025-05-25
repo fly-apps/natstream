@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Terminal } from "@/components/magicui/terminal";
 import { NavHeader } from "@/components/nav-header";
+import { Badge } from "@/components/ui/badge";
 
 interface LogEntry {
   message: string;
@@ -128,8 +129,13 @@ export default function Home() {
             }`}
           />
           <span className="text-sm text-muted-foreground">
-            {isConnected ? 'Connected' : 'Disconnected'}
+            {isConnected ? 'Connected to NATS' : 'Disconnected from NATS'}
           </span>
+          {isConnected && (
+            <Badge variant="outline" className="text-xs">
+              [fdaa::3]:4223
+            </Badge>
+          )}
           </div>
         </div>
       </div>
