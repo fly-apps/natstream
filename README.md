@@ -1,6 +1,6 @@
 <div align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/0ddb7abb-5784-473e-88b0-39a521a4b2f5">
-    <img src="https://github.com/user-attachments/assets/6b40b907-dc62-4c01-80ce-f07d16ce7281"</img>
+    <source media="(prefers-color-scheme: dark)" srcset="https://github.com/user-attachments/assets/372b1b69-d516-43bf-9abb-491c161fcd8c">
+    <img src="https://github.com/user-attachments/assets/9c6f240f-81f6-47ff-80da-d30ed4595325"</img>
   </picture>
 </div>
