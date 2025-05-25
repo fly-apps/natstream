@@ -67,9 +67,31 @@ export async function streamAll(cb: (s: string) => void): Promise<() => void> {
   
   try {
     connection = await getNatsConnection();
-    subscription = connection.subscribe("logs.>");
     
-    console.log("Subscribed to logs.>");
+    // Determine which logs to subscribe to based on environment variables
+    let subscriptionPattern: string;
+    const flyApp = process.env.FLY_APP;
+    const flyAppName = process.env.FLY_APP_NAME;
+    
+    if (flyApp === "*") {
+      // Show all apps in the org
+      subscriptionPattern = "logs.>";
+      console.log("Subscribing to all apps in org (logs.>)");
+    } else if (flyApp) {
+      // Show logs for specific app set via FLY_APP
+      subscriptionPattern = `logs.${flyApp}.>`;
+      console.log(`Subscribing to logs for app: ${flyApp} (${subscriptionPattern})`);
+    } else if (flyAppName) {
+      // Default to FLY_APP_NAME if FLY_APP is not set
+      subscriptionPattern = `logs.${flyAppName}.>`;
+      console.log(`Subscribing to logs for app: ${flyAppName} (${subscriptionPattern})`);
+    } else {
+      // Fallback to all logs if neither is set
+      subscriptionPattern = "logs.>";
+      console.log("No FLY_APP or FLY_APP_NAME set, subscribing to all apps (logs.>)");
+    }
+    
+    subscription = connection.subscribe(subscriptionPattern);
     
     // Process messages in the background
     (async () => {
