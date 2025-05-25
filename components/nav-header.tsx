@@ -22,10 +22,10 @@ export function NavHeader() {
             <Logs className="w-8 h-8 text-foreground" />
           </div>
           <div className="flex items-center gap-4">
-            <a href="#" className="text-foreground hover:text-purple-800 transition-colors">
-              <Github className="h-6 w-6" />
-              <span className="sr-only">GitHub repository</span>
-            </a>
+                      <a href="https://github.com/fly-apps/natstream" className="text-foreground hover:text-purple-800 transition-colors">
+            <Github className="h-6 w-6" />
+            <span className="sr-only">GitHub repository</span>
+          </a>
             <ModeToggle />
           </div>
         </div>
@@ -40,7 +40,7 @@ export function NavHeader() {
           <Logs className="w-8 h-8 text-foreground" />
         </div>
         <div className="flex items-center gap-4">
-          <a href="#" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-purple-800 transition-colors">
+          <a href="https://github.com/fly-apps/natstream" target="_blank" rel="noopener noreferrer" className="text-foreground hover:text-purple-800 transition-colors">
             <Github className="h-6 w-6" />
             <span className="sr-only">GitHub repository</span>
           </a>
