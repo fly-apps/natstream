@@ -18,8 +18,6 @@ export async function getNatsConnection(): Promise<NatsConnection> {
       }
       
       console.log("Connecting to NATS...");
-      console.log("FLY_ORG:", flyOrg);
-      console.log("ACCESS_TOKEN length:", accessToken.length);
       
       conn = await connect({
         servers: "[fdaa::3]:4223",
