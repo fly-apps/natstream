@@ -122,21 +122,23 @@ export default function Home() {
           </Terminal>
         </div>
         
-        <div className="flex items-center justify-end gap-2 mt-2">
-          <div 
-            className={`w-2 h-2 rounded-full ${
-              isConnected ? 'bg-green-500' : 'bg-red-500'
-            }`}
-          />
-          <span className="text-sm text-muted-foreground">
-            {isConnected ? 'Connected to NATS' : 'Disconnected from NATS'}
-          </span>
+        <div className="flex items-center justify-between mt-2">
+          <div className="flex items-center gap-2">
+            <div 
+              className={`w-2 h-2 rounded-full ${
+                isConnected ? 'bg-green-500' : 'bg-red-500'
+              }`}
+            />
+            <span className="text-sm text-muted-foreground">
+              {isConnected ? 'Connected to NATS' : 'Disconnected from NATS'}
+            </span>
+          </div>
           {isConnected && (
             <Badge variant="outline" className="text-xs">
               [fdaa::3]:4223
             </Badge>
           )}
-          </div>
+        </div>
         </div>
       </div>
     </div>
