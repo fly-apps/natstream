@@ -1,103 +1,138 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useRef, useState } from "react";
+import { Terminal } from "@/components/magicui/terminal";
+import { NavHeader } from "@/components/nav-header";
+
+interface LogEntry {
+  message: string;
+  timestamp: number;
+  type?: string;
+  persistent?: boolean;
+}
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const streamingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+  useEffect(() => {
+    // Connect to the Server-Sent Events endpoint
+    const connectToLogs = () => {
+      try {
+        const eventSource = new EventSource('/api/logs');
+        eventSourceRef.current = eventSource;
+
+        eventSource.onopen = () => {
+          setIsConnected(true);
+          console.log('Connected to log stream');
+        };
+
+        eventSource.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            const logEntry: LogEntry = {
+              message: data.message,
+              timestamp: data.timestamp,
+              type: data.type,
+              persistent: data.persistent
+            };
+            setLogs(prev => [...prev.slice(-999), logEntry]); // Keep last 1000 logs
+            
+            // Set streaming to true when receiving messages
+            setIsStreaming(true);
+            
+            // Clear existing timeout and set a new one
+            if (streamingTimeoutRef.current) {
+              clearTimeout(streamingTimeoutRef.current);
+            }
+            
+            // Stop showing spinner after 2 seconds of no new messages
+            streamingTimeoutRef.current = setTimeout(() => {
+              setIsStreaming(false);
+            }, 2000);
+          } catch (error) {
+            console.error('Error parsing log data:', error);
+          }
+        };
+
+        eventSource.onerror = (error) => {
+          console.error('EventSource error:', error);
+          setIsConnected(false);
+          setIsStreaming(false);
+          eventSource.close();
+          
+          // Clear streaming timeout
+          if (streamingTimeoutRef.current) {
+            clearTimeout(streamingTimeoutRef.current);
+          }
+          
+          // Reconnect after 5 seconds
+          setTimeout(connectToLogs, 5000);
+        };
+      } catch (error) {
+        console.error('Failed to connect to log stream:', error);
+        setIsConnected(false);
+      }
+    };
+
+    connectToLogs();
+
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+      if (streamingTimeoutRef.current) {
+        clearTimeout(streamingTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-neutral-100 dark:bg-background">
+      <NavHeader />
+      <div className="p-4">
+      <div className="mx-auto max-w-7xl">
+          <div className="w-full h-[calc(100vh-8rem)]">
+          <Terminal className="w-full h-full max-w-none max-h-none" isStreaming={isStreaming}>
+            {logs.length === 0 ? (
+              <div className="text-muted-foreground">
+                {isConnected ? 'Waiting for logs...' : 'Connecting to log stream...'}
+              </div>
+            ) : (
+              logs.slice().reverse().map((log, index) => {
+                const timestamp = new Date(log.timestamp).toLocaleTimeString('en-US', {
+                  hour12: false,
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  second: '2-digit',
+                  fractionalSecondDigits: 3
+                });
+                
+                return (
+                  <div key={index} className="font-mono text-sm">
+                    <span className="text-muted-foreground">[{timestamp}]</span> {log.message}
+                  </div>
+                );
+              })
+            )}
+          </Terminal>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+        
+        <div className="flex items-center justify-end gap-2 mt-2">
+          <div 
+            className={`w-2 h-2 rounded-full ${
+              isConnected ? 'bg-green-500' : 'bg-red-500'
+            }`}
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          <span className="text-sm text-muted-foreground">
+            {isConnected ? 'Connected' : 'Disconnected'}
+          </span>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
