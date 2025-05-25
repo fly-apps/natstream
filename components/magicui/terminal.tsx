@@ -113,7 +113,7 @@ export const Terminal = ({ children, className, isStreaming = false }: TerminalP
           <div className="h-2 w-2 rounded-full bg-green-500"></div>
         </div>
         {isStreaming && (
-          <div className="absolute top-4 right-4">
+          <div className="absolute top-1/2 right-4 -translate-y-1/2">
             <Spinner size="sm" className="text-muted-foreground" />
           </div>
         )}
