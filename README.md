@@ -88,6 +88,6 @@ fly launch --from https://github.com/fly-apps/natstream/ \
   --org $ORG \
   --env FLY_ORG=$ORG \
   --no-deploy \
-  --secrets ACCESS_TOKEN="$(fly tokens create readonly $ORG)"
+  --secrets ACCESS_TOKEN="$(fly tokens create readonly $ORG)" \
   --flycast
 ```
