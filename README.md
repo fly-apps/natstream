@@ -79,14 +79,22 @@ Streams real-time logs via Server-Sent Events.
 
 > **Note:** The application is designed to run on Fly.io with automatic environment variable injection. The `FLY_APP_NAME` variable is a reserved runtime variable that's **always set** by Fly.io on each machine, meaning the app will stream its own logs by default unless `FLY_APP` is explicitly configured.
 
+Launch the app from the GitHub repository
 ```bash
-# Launch the app from the GitHub repository
-fly launch --from https://github.com/fly-apps/natstream/ --yes --copy-config --org $ORG \
-  --env FLY_ORG=$ORG --no-deploy
+fly launch --from https://github.com/fly-apps/natstream/ \
+  --yes \
+  --copy-config \
+  --org $ORG \
+  --env FLY_ORG=$ORG \
+  --no-deploy
+```
 
-# Set the access token as a secret (creates a readonly token for the org)
+Set the access token as a secret (creates a readonly token for the org)
+```bash
 fly secrets set ACCESS_TOKEN="$(fly tokens create readonly $ORG)" --stage
+```
 
-# Deploy with flycast networking
+Deploy with flycast networking
+```bash
 fly deploy --flycast
 ```
