@@ -74,24 +74,11 @@ Streams real-time logs via Server-Sent Events.
 - Error notifications
 - Automatic cleanup on disconnect
 
-## Development
-
-```bash
-# Install dependencies
-bun install
-
-# Set environment variables
-export FLY_ORG="your-org"
-export ACCESS_TOKEN="your-token"
-export FLY_APP="your-app"  # optional
-
-# Run development server
-bun dev
-```
-
 ## Deployment
 
 ### Quick Deploy from GitHub
+
+> **Note:** The application is designed to run on Fly.io with automatic environment variable injection. The `FLY_APP_NAME` variable is a reserved runtime variable that's automatically set by Fly.io on each machine.
 
 ```bash
 # Launch the app from the GitHub repository
@@ -104,7 +91,3 @@ fly secrets set ACCESS_TOKEN="$(fly tokens create readonly $ORG)" --stage
 # Deploy with flycast networking
 fly deploy --flycast
 ```
-
-### Manual Deployment
-
-The application is designed to run on Fly.io with automatic environment variable injection. The `FLY_APP_NAME` variable is a reserved runtime variable that's automatically set by Fly.io on each machine.
