@@ -34,12 +34,12 @@ The application establishes a persistent connection to Fly.io's NATS server at `
 | Variable | Description | Default Behavior |
 |----------|-------------|------------------|
 | `FLY_APP` | Specific app to monitor | If not set, falls back to `FLY_APP_NAME` |
-| `FLY_APP_NAME` | Reserved runtime variable automatically set by Fly.io | If neither is set, streams **all apps** in org |
+| `FLY_APP_NAME` | Reserved runtime variable automatically set by Fly.io | **Always set** - app streams its own logs by default |
 
 ### Special Values
 
 - **`FLY_APP="*"`** - Explicitly stream logs from all applications in the organization
-- **No app variables set** - Defaults to streaming all applications (`logs.>` pattern)
+- **Default behavior** - Since `FLY_APP_NAME` is always set by Fly.io, the app streams its own logs by default
 
 ### NATS Subscription Patterns
 
@@ -48,8 +48,7 @@ The application subscribes to different NATS subjects based on configuration:
 ```
 FLY_APP="*"           → logs.>              (all apps in org)
 FLY_APP="myapp"       → logs.myapp.>        (specific app)
-FLY_APP_NAME="myapp"  → logs.myapp.>        (fallback to app name)
-(no variables)        → logs.>              (default: all apps)
+FLY_APP_NAME="myapp"  → logs.myapp.>        (default: own app logs)
 ```
 
 ## API Endpoints
@@ -78,7 +77,7 @@ Streams real-time logs via Server-Sent Events.
 
 ### Quick Deploy from GitHub
 
-> **Note:** The application is designed to run on Fly.io with automatic environment variable injection. The `FLY_APP_NAME` variable is a reserved runtime variable that's automatically set by Fly.io on each machine.
+> **Note:** The application is designed to run on Fly.io with automatic environment variable injection. The `FLY_APP_NAME` variable is a reserved runtime variable that's **always set** by Fly.io on each machine, meaning the app will stream its own logs by default unless `FLY_APP` is explicitly configured.
 
 ```bash
 # Launch the app from the GitHub repository
